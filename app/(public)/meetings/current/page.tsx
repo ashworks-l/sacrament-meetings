@@ -3,9 +3,9 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { getCurrentMeeting } from "@/lib/meetings-db";
-import MeetingDetail from "@/components/MeetingDetail";
+import type { ReactNode } from "react";
 
-async function CurrentMeetingContent() {
+async function CurrentMeetingContent(): Promise<ReactNode> {
   await connection();
 
   const currentMeeting = await getCurrentMeeting();
@@ -14,12 +14,18 @@ async function CurrentMeetingContent() {
     redirect("/meetings");
   }
 
-  return <MeetingDetail meeting={currentMeeting} />;
+  redirect(`/meetings/${currentMeeting.id}`);
 }
 
 export default function CurrentMeetingPage() {
   return (
-    <Suspense fallback={<p className="p-8 text-center">Loading current meeting...</p>}>
+    <Suspense
+      fallback={
+        <p className="p-8 text-center">
+          Loading current meeting...
+        </p>
+      }
+    >
       <CurrentMeetingContent />
     </Suspense>
   );
