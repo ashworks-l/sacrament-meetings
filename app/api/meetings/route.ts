@@ -1,11 +1,24 @@
 
 import { NextRequest, NextResponse } from "next/server";
+import { connection } from "next/server";
 import { getMeetings } from "@/lib/meetings-db";
 
 export async function GET(request: NextRequest) {
-  const date = request.nextUrl.searchParams.get("date") ?? undefined;
+  await connection();
 
-  const meetings = getMeetings(date);
+  try {
+    const date =
+      request.nextUrl.searchParams.get("date") ?? undefined;
 
-  return NextResponse.json(meetings);
+    const meetings = await getMeetings(date);
+
+    return NextResponse.json(meetings);
+  } catch (error) {
+    console.error("Error fetching meetings:", error);
+
+    return NextResponse.json(
+      { error: "Failed to load meetings." },
+      { status: 500 }
+    );
+  }
 }
